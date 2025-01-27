@@ -28,7 +28,7 @@ const UserForm = ({ show, onHide, user }) => {
       } else {
         let res =  await axios.post(url, userData);
         if (res){
-          alert("New User Added")
+          alert("New User Added Successfully")
         }
         
       }
