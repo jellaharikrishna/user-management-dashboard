@@ -58,20 +58,9 @@ app.post('/users', async (req, res) => {
 // users array
 app.get("/users", async(req,res)=>{
     try {
-        const { page = 1, limit = 5 } = req.query;
-        const offset = (page - 1) * limit;
-
-        const getUsers = `SELECT * FROM users LIMIT ? OFFSET ?`
-        const usersArray = await db.all(getUsers, [parseInt(limit), parseInt(offset)])
-
-        const totalUsersQuery = `SELECT COUNT(*) AS count FROM users`;
-        const totalUsers = await db.get(totalUsersQuery);
-
-        res.send({
-            data: usersArray,
-            currentPage: parseInt(page),
-            totalPages: Math.ceil(totalUsers.count / limit),
-        })
+        const getUsers = `SELECT * FROM users`
+        const usersArray = await db.all(getUsers)
+        res.send(usersArray)
     } catch (e) {
         res.status(500).send(`ErrorMsg: ${e.message}`)
     }
