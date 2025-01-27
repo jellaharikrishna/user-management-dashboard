@@ -19,15 +19,18 @@ const UserForm = ({ show, onHide, user }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(user.id)
-    console.log(userData)
     try {
       if (user) {
-        await axios.put(`${url}/${user.id}`, userData);
-        alert("Updated User Data")
+        let res = await axios.put(`${url}/${user.id}`, userData);
+        if (res){
+          alert("Updated User Data")
+        }
       } else {
-        await axios.post(url, userData);
-        alert("New User Added")
+        let res =  await axios.post(url, userData);
+        if (res){
+          alert("New User Added")
+        }
+        
       }
       onHide();
     } catch (err) {

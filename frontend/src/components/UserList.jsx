@@ -7,24 +7,33 @@ const UserList = () => {
   const [users, setUsers] = useState([]);
   const [editUser, setEditUser] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const pageSize = 5;
 
   const url = "https://user-management-dashboard-backend.onrender.com/users";
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (page) => {
     try {
-      const response = await axios.get(url);
-      setUsers(response.data);
+      const response = await axios.get(`url/?page=${page}&limit=${pageSize}`);
+      const data = await response.json();
+      setUsers(data.data);
+      setCurrentPage(data.currentPage);
+      setTotalPages(data.totalPages);
     } catch (err) {
       console.error("Error fetching users:", err);
     }
   };
 
   const deleteTask = async (id) => {
-    if (window.confirm("Are you sure you want to delete this task?")) {
+    if (window.confirm("Are you sure you want to delete the user?")) {
       try {
-        await axios.delete(`${url}/${id}`);
-        fetchUsers();
-        alert("Deleted User")
+        let res = await axios.delete(`${url}/${id}`);
+        if (res){
+          alert("User Deleted")
+          fetchUsers();
+          console.log(users)
+        }
       } catch (err) {
         console.error("Error deleting user:", err);
       }
@@ -42,10 +51,15 @@ const UserList = () => {
     fetchUsers();
   };
 
-  //const filteredTasks = !filterStatus ? tasks : tasks.filter((eachValue => eachValue.status === filterStatus))
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    fetchUsers(currentPage);
+  }, [currentPage]);
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+        setCurrentPage(page);
+    }
+};
 
   return (
     <div>
@@ -80,7 +94,7 @@ const UserList = () => {
                 </Button>
                 <Button
                   variant="danger"
-                  onClick={() => deleteTask(user._id)}
+                  onClick={() => deleteTask(user.id)}
                 >
                   Delete
                 </Button>
@@ -97,6 +111,31 @@ const UserList = () => {
           user={editUser}
         />
       )}
+      <div style={{ marginTop: "20px" }}>
+                <button
+                    disabled={currentPage === 1}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                >
+                    Previous
+                </button>
+                {Array.from({ length: totalPages }, (_, index) => (
+                    <button
+                        key={index + 1}
+                        onClick={() => handlePageChange(index + 1)}
+                        style={{
+                            fontWeight: currentPage === index + 1 ? "bold" : "normal",
+                        }}
+                    >
+                        {index + 1}
+                    </button>
+                ))}
+                <button
+                    disabled={currentPage === totalPages}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                >
+                    Next
+                </button>
+            </div>
     </div>
   );
 };
