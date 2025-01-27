@@ -8,7 +8,13 @@ const path = require('path');
 
 const app = express()
 app.use(express.json())
-app.use(cors());
+
+app.use(cors({
+    origin: "https://user-management-dashboard-frontend.onrender.com", // Corrected origin without trailing slash
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+    credentials: true // Include credentials if required
+}));
 
 const dbPath = path.join(__dirname, "users.db")
 let db = null
