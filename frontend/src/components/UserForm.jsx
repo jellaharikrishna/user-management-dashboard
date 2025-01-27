@@ -1,50 +1,67 @@
 import React, { useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
+import axios from "axios";
 
-const UserForm = ({ addUser, show, onHide, task }) => {
+const UserForm = ({ show, onHide, user }) => {
   const [userData, setUserData] = useState({
-          name: "",
-          email: "",
-        //   department: "",
+          firstname: user ? user.firstname : "",
+          lastname: user ? user.lastname : "",
+          email: user ? user.email : "",
+          department: user ? user.department : "",
     });
+
+  const url = "https://user-management-dashboard-backend.onrender.com/users";
 
 
   const handleChange = (e) => {
     setUserData({ ...userData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    addUser(userData)
+    console.log(user.id)
+    console.log(userData)
+    try {
+      if (user) {
+        await axios.put(`${url}/${user.id}`, userData);
+        alert("Updated User Data")
+      } else {
+        await axios.post(url, userData);
+        alert("New User Added")
+      }
+      onHide();
+    } catch (err) {
+      console.error("Error saving task:", err);
+    }
   };
 
   return (
     <Modal show={show} onHide={onHide}>
       <Modal.Header closeButton>
-        <Modal.Title>{task ? "Edit User" : "Add User"}</Modal.Title>
+        <Modal.Title>{user ? "Edit User" : "Add User"}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
-            <Form.Label>Name</Form.Label>
+            <Form.Label>First Name</Form.Label>
             <Form.Control
               type="text"
-              name="name"
-              value={userData.firstName}
+              name="firstname"
+              value={userData.firstname}
               onChange={handleChange}
               required
             />
           </Form.Group>
-          {/* <Form.Group className="mb-3">
+          <Form.Group className="mb-3">
             <Form.Label>Last Name</Form.Label>
             <Form.Control
               type="text"
-              name="lastName"
-              value={userData.lastName}
+              name="lastname"
+              value={userData.lastname}
               onChange={handleChange}
               required
             />
-          </Form.Group> */}
+          </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Email</Form.Label>
             <Form.Control
@@ -55,7 +72,7 @@ const UserForm = ({ addUser, show, onHide, task }) => {
               required
             />
           </Form.Group>
-          {/* <Form.Group className="mb-3">
+          <Form.Group className="mb-3">
             <Form.Label>Department</Form.Label>
             <Form.Control
               type="text"
@@ -64,7 +81,7 @@ const UserForm = ({ addUser, show, onHide, task }) => {
               onChange={handleChange}
               required
             />
-          </Form.Group> */}
+          </Form.Group>
           <Button variant="primary" type="submit">
             Save
           </Button>

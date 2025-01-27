@@ -5,64 +5,47 @@ import UserForm from "./UserForm";
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
-  const [selectedTask, setSelectedTask] = useState(null);
+  const [editUser, setEditUser] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
-  const url = "https://jsonplaceholder.typicode.com/users";
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  const url = "https://user-management-dashboard-backend.onrender.com/users";
 
   const fetchUsers = async () => {
     try {
       const response = await axios.get(url);
       setUsers(response.data);
     } catch (err) {
-      console.error("Error fetching tasks:", err);
+      console.error("Error fetching users:", err);
     }
   };
-
-  const addUser = async (userData) => {
-        try {
-          const response = await axios.post(url, userData);
-          console.log("users", users);
-          const {id, name}=  response.data
-          const dataSplit = {
-            id: id,
-            name,
-          }
-          setUsers(prev => [...prev, dataSplit])
-          //fetchUsers();
-          setShowForm(false);
-        } catch (error) {
-          console.error(error.message);
-        }
-    };
 
   const deleteTask = async (id) => {
     if (window.confirm("Are you sure you want to delete this task?")) {
       try {
-        await axios.delete(`https://robot-space-todo-tasks.onrender.com/tasks/${id}`);
+        await axios.delete(`${url}/${id}`);
         fetchUsers();
+        alert("Deleted User")
       } catch (err) {
-        console.error("Error deleting task:", err);
+        console.error("Error deleting user:", err);
       }
     }
   };
 
-  const openForm = (task = null) => {
-    setSelectedTask(task);
+  const openForm = (user = null) => {
+    setEditUser(user);
     setShowForm(true);
   };
 
   const closeForm = () => {
-    setSelectedTask(null);
+    setEditUser(null);
     setShowForm(false);
     fetchUsers();
   };
 
   //const filteredTasks = !filterStatus ? tasks : tasks.filter((eachValue => eachValue.status === filterStatus))
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   return (
     <div>
@@ -75,7 +58,7 @@ const UserList = () => {
             <th>First Name</th>
             <th>Last Name</th>
             <th>Email</th>
-            {/* <th>Department</th> */}
+            <th>Department</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -83,10 +66,10 @@ const UserList = () => {
           {users.map((user) => (
             <tr key={user.id}>
               <td>{user.id}</td>
-              <td>{user.name.split(" ")[0]}</td>
-              <td>{user.name.split(" ")[1]}</td>
+              <td>{user.firstname}</td>
+              <td>{user.lastname}</td>
               <td>{user.email}</td>
-              {/* <td>{user.department}</td> */}
+              <td>{user.department}</td>
               <td>
                 <Button
                   variant="warning"
@@ -109,10 +92,9 @@ const UserList = () => {
 
       {showForm && (
         <UserForm
-          addUser={addUser}
           show={showForm}
           onHide={closeForm}
-          task={selectedTask}
+          user={editUser}
         />
       )}
     </div>

@@ -66,6 +66,18 @@ app.get("/users", async(req,res)=>{
     }
 })
 
+// user object
+app.get("/users/:id", async(req,res)=>{
+    try {
+        const {id} = req.params
+        const getUser = `SELECT * FROM users WHERE id = '${id}'`
+        const userObj = await db.get(getUser)
+        res.send(userObj)
+    } catch (e) {
+        res.status(500).send(`ErrorMsg: ${e.message}`)
+    }
+})
+
 
 // update user 
 app.put("/users/:id",  async(req,res)=>{
@@ -73,12 +85,13 @@ app.put("/users/:id",  async(req,res)=>{
         const {id} = req.params
         const {firstname, lastname, email, department} = req.body
         const updateUser = `UPDATE users 
-            SET firstname = '${firstname}',
-                lastname = '${lastname}',
-                email = '${email}',
-                department = '${department}',
-            WHERE id = '${id}'`
-        await db.run(updateUser)
+            SET firstname = ?,
+                lastname = ?,
+                email = ?,
+                department = ?
+            WHERE id = ?
+        `
+        await db.run(updateUser, [firstname, lastname, email, department, id])
         res.send("Updated User Details")
     
     } catch (e) {
